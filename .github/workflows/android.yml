@@ -38,6 +38,12 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Compute version slug
+        id: slug
+        run: |
+          slug="${GITHUB_REF_NAME//\//-}"
+          echo "slug=${slug}" >> "$GITHUB_OUTPUT"
+
       - name: Assemble debug APK
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
@@ -47,13 +53,13 @@ jobs:
       - name: Stage APKs
         run: |
           mkdir -p artifacts
-          cp app/build/outputs/apk/debug/app-debug.apk artifacts/xyz-debug-${{ github.ref_name }}.apk
-          cp app/build/outputs/apk/release/app-release.apk artifacts/xyz-release-${{ github.ref_name }}.apk
+          cp app/build/outputs/apk/debug/app-debug.apk "artifacts/xyz-debug-${{ steps.slug.outputs.slug }}.apk"
+          cp app/build/outputs/apk/release/app-release.apk "artifacts/xyz-release-${{ steps.slug.outputs.slug }}.apk"
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: xyz-apks-${{ github.ref_name }}
+          name: xyz-apks-${{ steps.slug.outputs.slug }}
           path: artifacts/*.apk
           if-no-files-found: error
 
