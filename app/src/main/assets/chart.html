@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>XYZ 3D Charts</title>
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; font-family: sans-serif; }
+    #chart { width: 100vw; height: 100vh; }
+    #legend {
+      position: fixed; top: 8px; left: 8px;
+      background: rgba(0,0,0,0.55); padding: 6px 10px; border-radius: 6px;
+      font-size: 12px; line-height: 1.4;
+    }
+    #placeholder {
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; opacity: 0.6;
+    }
+  </style>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" onload="window.__plotlyReady=true;window.__maybeRender&&window.__maybeRender();"></script>
+</head>
+<body>
+  <div id="chart"><div id="placeholder">Loading prices…</div></div>
+  <div id="legend">
+    X: NIY/USD &nbsp; Y: SPY/USD &nbsp; Z: SCBNK225/USD
+  </div>
+  <script>
+    let pendingPayload = null;
+
+    function _draw(payload) {
+      const { labels, niy, spy, scb } = payload;
+      // Filter rows where any value is missing.
+      const xs = [], ys = [], zs = [], texts = [];
+      for (let i = 0; i < labels.length; i++) {
+        if (niy[i] != null && spy[i] != null && scb[i] != null) {
+          xs.push(niy[i]);
+          ys.push(spy[i]);
+          zs.push(scb[i]);
+          texts.push(labels[i]);
+        }
+      }
+
+      const colors = xs.map((_, i) => i / Math.max(1, xs.length - 1));
+
+      const scatter = {
+        type: 'scatter3d',
+        mode: 'markers',
+        x: xs, y: ys, z: zs,
+        text: texts,
+        hovertemplate:
+          '%{text}<br>NIY/USD: %{x:.2f}<br>SPY/USD: %{y:.2f}<br>SCBNK225/USD: %{z:.4f}<extra></extra>',
+        marker: {
+          size: 4,
+          color: colors,
+          colorscale: 'Viridis',
+          showscale: false,
+          opacity: 0.9,
+        },
+      };
+
+      const line = {
+        type: 'scatter3d',
+        mode: 'lines',
+        x: xs, y: ys, z: zs,
+        line: { color: '#ffd400', width: 3 },
+        hoverinfo: 'skip',
+        showlegend: false,
+      };
+
+      const layout = {
+        paper_bgcolor: '#000',
+        plot_bgcolor: '#000',
+        font: { color: '#fff' },
+        showlegend: false,
+        margin: { l: 0, r: 0, t: 24, b: 0 },
+        scene: {
+          xaxis: { title: 'NIY/USD (USD)', color: '#fff', gridcolor: '#333', backgroundcolor: '#000', showbackground: true },
+          yaxis: { title: 'SPY/USD (USD)', color: '#fff', gridcolor: '#333', backgroundcolor: '#000', showbackground: true },
+          zaxis: { title: 'SCBNK225/USD (USD)', color: '#fff', gridcolor: '#333', backgroundcolor: '#000', showbackground: true },
+          camera: { eye: { x: 1.6, y: 1.6, z: 1.0 } },
+        },
+      };
+
+      const config = { responsive: true, displaylogo: false };
+
+      const target = document.getElementById('chart');
+      target.innerHTML = '';
+      Plotly.newPlot(target, [scatter, line], layout, config);
+    }
+
+    function renderChart(payload) {
+      pendingPayload = payload;
+      _maybeRender();
+    }
+
+    function _maybeRender() {
+      if (window.__plotlyReady && pendingPayload) {
+        _draw(pendingPayload);
+        pendingPayload = null;
+      }
+    }
+
+    window.__maybeRender = _maybeRender;
+    window.renderChart = renderChart;
+  </script>
+</body>
+</html>

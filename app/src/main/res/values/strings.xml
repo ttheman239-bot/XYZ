@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">XYZ 3D Charts</string>
+    <string name="loading">Loading prices…</string>
+    <string name="error_loading">Could not fetch prices: %1$s</string>
+</resources>

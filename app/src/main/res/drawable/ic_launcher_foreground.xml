@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Three USD-axis lines crossing at the origin, suggesting a 3D price space. -->
+    <group android:translateX="54" android:translateY="54">
+        <path
+            android:strokeColor="#1E90FF"
+            android:strokeWidth="4"
+            android:pathData="M -28,16 L 28,-16" />
+        <path
+            android:strokeColor="#1E90FF"
+            android:strokeWidth="4"
+            android:pathData="M 0,-30 L 0,30" />
+        <path
+            android:strokeColor="#1E90FF"
+            android:strokeWidth="4"
+            android:pathData="M -28,-12 L 28,12" />
+        <path
+            android:fillColor="#FFD400"
+            android:pathData="M -10,-4 m -3,0 a 3,3 0 1,0 6,0 a 3,3 0 1,0 -6,0" />
+        <path
+            android:fillColor="#FFD400"
+            android:pathData="M 4,-10 m -3,0 a 3,3 0 1,0 6,0 a 3,3 0 1,0 -6,0" />
+        <path
+            android:fillColor="#FFD400"
+            android:pathData="M 10,8 m -3,0 a 3,3 0 1,0 6,0 a 3,3 0 1,0 -6,0" />
+    </group>
+</vector>
