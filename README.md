@@ -12,12 +12,18 @@ trajectory line so you can see the joint price path through 3D space.
 
 ## 📥 Download APK
 
-Latest release (always the newest published version):
+Click to download the most recent build (the `nightly` release is overwritten
+on every push):
 
-| Build   | Download |
-|---------|----------|
-| Release | **[xyz-release.apk](https://github.com/ttheman239-bot/XYZ/releases/latest/download/xyz-release.apk)** |
-| Debug   | **[xyz-debug.apk](https://github.com/ttheman239-bot/XYZ/releases/latest/download/xyz-debug.apk)** |
+| Build   | Direct download |
+|---------|-----------------|
+| Release | **[xyz-release.apk](https://github.com/ttheman239-bot/XYZ/releases/download/nightly/xyz-release.apk)** |
+| Debug   | **[xyz-debug.apk](https://github.com/ttheman239-bot/XYZ/releases/download/nightly/xyz-debug.apk)** |
+
+Or always-latest (resolves to whichever release is marked latest):
+
+- <https://github.com/ttheman239-bot/XYZ/releases/latest/download/xyz-release.apk>
+- <https://github.com/ttheman239-bot/XYZ/releases/latest/download/xyz-debug.apk>
 
 All releases: <https://github.com/ttheman239-bot/XYZ/releases>
 
@@ -28,11 +34,11 @@ https://github.com/ttheman239-bot/XYZ/releases/download/<version>/xyz-release-<v
 https://github.com/ttheman239-bot/XYZ/releases/download/<version>/xyz-debug-<version>.apk
 ```
 
-> The links above start working as soon as the first `v*` tag is pushed and
-> the **Android Build** workflow finishes. Until then, grab the APK from the
-> latest run's **Artifacts** section: <https://github.com/ttheman239-bot/XYZ/actions>
+> First-time setup: the `nightly` link starts working a few minutes after the
+> Android Build workflow first succeeds. Track the run at
+> <https://github.com/ttheman239-bot/XYZ/actions>.
 
-To cut a release:
+To cut a frozen version:
 
 ```bash
 git tag -a v1.0.0 -m "v1.0.0"
