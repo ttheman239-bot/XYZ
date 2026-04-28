@@ -10,6 +10,35 @@ in **USD**:
 Each point is one trading day from the past year; points are connected by a
 trajectory line so you can see the joint price path through 3D space.
 
+## 📥 Download APK
+
+Latest release (always the newest published version):
+
+| Build   | Download |
+|---------|----------|
+| Release | **[xyz-release.apk](https://github.com/ttheman239-bot/XYZ/releases/latest/download/xyz-release.apk)** |
+| Debug   | **[xyz-debug.apk](https://github.com/ttheman239-bot/XYZ/releases/latest/download/xyz-debug.apk)** |
+
+All releases: <https://github.com/ttheman239-bot/XYZ/releases>
+
+Per-version pinned URLs (replace `<version>` with the tag, e.g. `v1.0.0`):
+
+```
+https://github.com/ttheman239-bot/XYZ/releases/download/<version>/xyz-release-<version>.apk
+https://github.com/ttheman239-bot/XYZ/releases/download/<version>/xyz-debug-<version>.apk
+```
+
+> The links above start working as soon as the first `v*` tag is pushed and
+> the **Android Build** workflow finishes. Until then, grab the APK from the
+> latest run's **Artifacts** section: <https://github.com/ttheman239-bot/XYZ/actions>
+
+To cut a release:
+
+```bash
+git tag -a v1.0.0 -m "v1.0.0"
+git push origin v1.0.0
+```
+
 ## How it works
 
 `MainActivity` fetches daily closes from Yahoo Finance for `SPY`, `^N225`,
@@ -31,20 +60,3 @@ Requires JDK 17 and an Android SDK with platform 34.
 ```
 
 The APK lands at `app/build/outputs/apk/debug/app-debug.apk`.
-
-## CI builds & download links
-
-The workflow at `.github/workflows/android.yml` builds debug + release APKs on
-every push and uploads them as workflow artifacts. Pushing a tag like `v1.0.0`
-additionally creates a GitHub Release with the APKs attached.
-
-Per-version download links once a release is published:
-
-```
-https://github.com/ttheman239-bot/xyz/releases/tag/<version>
-https://github.com/ttheman239-bot/xyz/releases/download/<version>/xyz-release-<version>.apk
-https://github.com/ttheman239-bot/xyz/releases/download/<version>/xyz-debug-<version>.apk
-```
-
-For non-tagged builds, grab the APK from the run's **Artifacts** section on
-the Actions tab.

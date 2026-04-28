@@ -55,6 +55,9 @@ jobs:
           mkdir -p artifacts
           cp app/build/outputs/apk/debug/app-debug.apk "artifacts/xyz-debug-${{ steps.slug.outputs.slug }}.apk"
           cp app/build/outputs/apk/release/app-release.apk "artifacts/xyz-release-${{ steps.slug.outputs.slug }}.apk"
+          # Unversioned aliases so /releases/latest/download/<name>.apk always resolves.
+          cp app/build/outputs/apk/debug/app-debug.apk artifacts/xyz-debug.apk
+          cp app/build/outputs/apk/release/app-release.apk artifacts/xyz-release.apk
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
