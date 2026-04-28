@@ -20,6 +20,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Show environment
+        run: |
+          echo "::group::env"
+          uname -a
+          java -version 2>&1
+          echo "ANDROID_HOME=$ANDROID_HOME ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls -la
+          echo "::endgroup::"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -50,36 +59,38 @@ jobs:
           slug="${GITHUB_REF_NAME//\//-}"
           echo "slug=${slug}" >> "$GITHUB_OUTPUT"
 
-      - name: Assemble debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+      - name: Build APKs (debug + release)
+        id: build
+        continue-on-error: true
+        run: |
+          mkdir -p logs
+          set -o pipefail
+          ./gradlew :app:assembleDebug :app:assembleRelease --no-daemon --stacktrace --info 2>&1 | tee logs/gradle-build.log
 
-      - name: Assemble release APK
-        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
-
-      - name: Stage APKs
+      - name: Stage release artifacts
+        id: stage
         run: |
           mkdir -p artifacts
-          cp app/build/outputs/apk/debug/app-debug.apk "artifacts/xyz-debug-${{ steps.slug.outputs.slug }}.apk"
-          cp app/build/outputs/apk/release/app-release.apk "artifacts/xyz-release-${{ steps.slug.outputs.slug }}.apk"
-          # Unversioned aliases so /releases/latest/download/<name>.apk always resolves.
-          cp app/build/outputs/apk/debug/app-debug.apk artifacts/xyz-debug.apk
-          cp app/build/outputs/apk/release/app-release.apk artifacts/xyz-release.apk
+          # Always include the build log for diagnosis
+          cp logs/gradle-build.log "artifacts/build-${{ steps.slug.outputs.slug }}.log" 2>/dev/null || true
+          if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
+            cp app/build/outputs/apk/debug/app-debug.apk "artifacts/xyz-debug-${{ steps.slug.outputs.slug }}.apk"
+            cp app/build/outputs/apk/debug/app-debug.apk artifacts/xyz-debug.apk
+          fi
+          if [ -f app/build/outputs/apk/release/app-release.apk ]; then
+            cp app/build/outputs/apk/release/app-release.apk "artifacts/xyz-release-${{ steps.slug.outputs.slug }}.apk"
+            cp app/build/outputs/apk/release/app-release.apk artifacts/xyz-release.apk
+          fi
+          ls -la artifacts/
 
-      - name: Upload APK artifacts
+      - name: Upload artifacts (APKs + log)
         uses: actions/upload-artifact@v4
         with:
-          name: xyz-apks-${{ steps.slug.outputs.slug }}
-          path: artifacts/*.apk
-          if-no-files-found: error
-
-      - name: Create GitHub Release (tagged)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          name: ${{ github.ref_name }}
-          tag_name: ${{ github.ref_name }}
-          generate_release_notes: true
-          files: artifacts/*.apk
+          name: xyz-build-${{ steps.slug.outputs.slug }}
+          path: |
+            artifacts/*.apk
+            artifacts/*.log
+          if-no-files-found: warn
 
       - name: Publish rolling "nightly" Release
         if: github.event_name != 'pull_request' && !startsWith(github.ref, 'refs/tags/')
@@ -91,5 +102,26 @@ jobs:
           make_latest: "true"
           body: |
             Auto-published from `${{ github.ref_name }}` @ ${{ github.sha }}.
-            This release is overwritten on every push — pin a `v*` tag for an immutable build.
-          files: artifacts/*.apk
+            Build status of last run: **${{ steps.build.outcome }}**.
+            If the APKs are missing, the attached `build-*.log` contains the gradle output.
+          files: |
+            artifacts/*.apk
+            artifacts/*.log
+
+      - name: Create GitHub Release (tagged)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            artifacts/*.apk
+            artifacts/*.log
+
+      - name: Fail job if build failed
+        if: steps.build.outcome != 'success'
+        run: |
+          echo "Gradle build failed; see attached log."
+          tail -200 logs/gradle-build.log || true
+          exit 1
