@@ -22,48 +22,143 @@
 <body>
   <div id="chart"><div id="placeholder">Loading prices…</div></div>
   <div id="legend">
-    X: NIY/USD &nbsp; Y: SPY/USD &nbsp; Z: SCBNK225/USD
+    X axis: NIY/USD &nbsp;·&nbsp; Y axis: SPY/USD &nbsp;·&nbsp; Z axis: SCBNK225/USD<br>
+    Yellow curves connect the three same-date price points across the axes.
   </div>
   <script>
     let pendingPayload = null;
 
+    // Sample N evenly spaced indices from [0, length-1].
+    function _sampleIndices(length, n) {
+      if (length <= n) return Array.from({ length }, (_, i) => i);
+      const step = (length - 1) / (n - 1);
+      const out = new Set();
+      for (let i = 0; i < n; i++) out.add(Math.round(i * step));
+      return [...out].sort((a, b) => a - b);
+    }
+
+    // Build a smooth 3-point curve A→B→C using a quadratic Bezier, with the
+    // midpoint between A and C as the control point pulled toward B. Returns
+    // an interpolated polyline of `steps` segments.
+    function _curveThroughThree(a, b, c, steps) {
+      // Use B as the control point so the curve actually passes near B.
+      // For a true 3-point pass-through, fit a quadratic Lagrange interpolant.
+      // Lagrange basis with t=0->A, t=0.5->B, t=1->C:
+      //   L0(t) = 2(t-0.5)(t-1)
+      //   L1(t) = -4 t (t-1)
+      //   L2(t) = 2 t (t-0.5)
+      const out = [];
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const l0 = 2 * (t - 0.5) * (t - 1);
+        const l1 = -4 * t * (t - 1);
+        const l2 = 2 * t * (t - 0.5);
+        out.push([
+          l0 * a[0] + l1 * b[0] + l2 * c[0],
+          l0 * a[1] + l1 * b[1] + l2 * c[1],
+          l0 * a[2] + l1 * b[2] + l2 * c[2],
+        ]);
+      }
+      return out;
+    }
+
     function _draw(payload) {
       const { labels, niy, spy, scb } = payload;
-      // Filter rows where any value is missing.
-      const xs = [], ys = [], zs = [], texts = [];
+
+      // Keep only rows where all three values are present.
+      const idx = [];
       for (let i = 0; i < labels.length; i++) {
-        if (niy[i] != null && spy[i] != null && scb[i] != null) {
-          xs.push(niy[i]);
-          ys.push(spy[i]);
-          zs.push(scb[i]);
-          texts.push(labels[i]);
-        }
+        if (niy[i] != null && spy[i] != null && scb[i] != null) idx.push(i);
       }
 
-      const colors = xs.map((_, i) => i / Math.max(1, xs.length - 1));
+      const niyVals = idx.map(i => niy[i]);
+      const spyVals = idx.map(i => spy[i]);
+      const scbVals = idx.map(i => scb[i]);
+      const dateLabels = idx.map(i => labels[i]);
 
-      const scatter = {
-        type: 'scatter3d',
-        mode: 'markers',
-        x: xs, y: ys, z: zs,
-        text: texts,
-        hovertemplate:
-          '%{text}<br>NIY/USD: %{x:.2f}<br>SPY/USD: %{y:.2f}<br>SCBNK225/USD: %{z:.4f}<extra></extra>',
-        marker: {
-          size: 4,
-          color: colors,
-          colorscale: 'Viridis',
-          showscale: false,
-          opacity: 0.9,
-        },
+      const zerosNiy = niyVals.map(() => 0);
+      const zerosSpy = spyVals.map(() => 0);
+      const zerosScb = scbVals.map(() => 0);
+
+      // Red dots on each axis (price markers per ticker, one per date).
+      const niyDots = {
+        type: 'scatter3d', mode: 'markers',
+        x: niyVals, y: zerosNiy, z: zerosNiy,
+        text: dateLabels,
+        name: 'NIY/USD',
+        hovertemplate: '%{text}<br>NIY/USD: %{x:.2f}<extra></extra>',
+        marker: { size: 4, color: '#ff3838' },
+      };
+      const spyDots = {
+        type: 'scatter3d', mode: 'markers',
+        x: zerosSpy, y: spyVals, z: zerosSpy,
+        text: dateLabels,
+        name: 'SPY/USD',
+        hovertemplate: '%{text}<br>SPY/USD: %{y:.2f}<extra></extra>',
+        marker: { size: 4, color: '#ff3838' },
+      };
+      const scbDots = {
+        type: 'scatter3d', mode: 'markers',
+        x: zerosScb, y: zerosScb, z: scbVals,
+        text: dateLabels,
+        name: 'SCBNK225/USD',
+        hovertemplate: '%{text}<br>SCBNK225/USD: %{z:.4f}<extra></extra>',
+        marker: { size: 4, color: '#ff3838' },
       };
 
-      const line = {
-        type: 'scatter3d',
-        mode: 'lines',
+      // Sample ~26 dates (≈ every 2 weeks of a 1y daily series) so the chart
+      // is readable. All other dates still show as red axis markers above.
+      const sample = _sampleIndices(idx.length, Math.min(26, idx.length));
+      const xs = [], ys = [], zs = [], cs = [], curveText = [];
+      const STEPS = 24;
+      sample.forEach((k, kk) => {
+        const a = [niyVals[k], 0, 0];
+        const b = [0, spyVals[k], 0];
+        const c = [0, 0, scbVals[k]];
+        const pts = _curveThroughThree(a, b, c, STEPS);
+        const t = kk / Math.max(1, sample.length - 1);
+        for (const p of pts) {
+          xs.push(p[0]); ys.push(p[1]); zs.push(p[2]); cs.push(t);
+          curveText.push(dateLabels[k]);
+        }
+        // Insert a break between curves so they are not connected.
+        xs.push(null); ys.push(null); zs.push(null); cs.push(null);
+        curveText.push('');
+      });
+
+      const curves = {
+        type: 'scatter3d', mode: 'lines',
         x: xs, y: ys, z: zs,
-        line: { color: '#ffd400', width: 3 },
-        hoverinfo: 'skip',
+        text: curveText,
+        name: 'same-date curves',
+        hovertemplate: '%{text}<extra></extra>',
+        line: {
+          color: cs,
+          colorscale: [[0, '#fff200'], [1, '#ff8a00']],
+          width: 3,
+        },
+        showlegend: false,
+      };
+
+      // Mark the three corner points of each sampled date as larger yellow dots
+      // so the curves' anchor points are visible (matches the sketch).
+      const anchorX = [], anchorY = [], anchorZ = [], anchorText = [];
+      sample.forEach(k => {
+        anchorX.push(niyVals[k], 0, 0);
+        anchorY.push(0, spyVals[k], 0);
+        anchorZ.push(0, 0, scbVals[k]);
+        anchorText.push(
+          dateLabels[k] + ' · NIY/USD ' + niyVals[k].toFixed(2),
+          dateLabels[k] + ' · SPY/USD ' + spyVals[k].toFixed(2),
+          dateLabels[k] + ' · SCBNK225/USD ' + scbVals[k].toFixed(4),
+        );
+      });
+      const anchors = {
+        type: 'scatter3d', mode: 'markers',
+        x: anchorX, y: anchorY, z: anchorZ,
+        text: anchorText,
+        hovertemplate: '%{text}<extra></extra>',
+        marker: { size: 5, color: '#ff3838' },
         showlegend: false,
       };
 
@@ -74,10 +169,11 @@
         showlegend: false,
         margin: { l: 0, r: 0, t: 24, b: 0 },
         scene: {
-          xaxis: { title: 'NIY/USD (USD)', color: '#fff', gridcolor: '#333', backgroundcolor: '#000', showbackground: true },
-          yaxis: { title: 'SPY/USD (USD)', color: '#fff', gridcolor: '#333', backgroundcolor: '#000', showbackground: true },
-          zaxis: { title: 'SCBNK225/USD (USD)', color: '#fff', gridcolor: '#333', backgroundcolor: '#000', showbackground: true },
+          xaxis: { title: 'NIY/USD (USD)', color: '#1e90ff', gridcolor: '#222', zerolinecolor: '#1e90ff', backgroundcolor: '#000', showbackground: true },
+          yaxis: { title: 'SPY/USD (USD)', color: '#1e90ff', gridcolor: '#222', zerolinecolor: '#1e90ff', backgroundcolor: '#000', showbackground: true },
+          zaxis: { title: 'SCBNK225/USD (USD)', color: '#1e90ff', gridcolor: '#222', zerolinecolor: '#1e90ff', backgroundcolor: '#000', showbackground: true },
           camera: { eye: { x: 1.6, y: 1.6, z: 1.0 } },
+          aspectmode: 'cube',
         },
       };
 
@@ -85,7 +181,7 @@
 
       const target = document.getElementById('chart');
       target.innerHTML = '';
-      Plotly.newPlot(target, [scatter, line], layout, config);
+      Plotly.newPlot(target, [niyDots, spyDots, scbDots, curves, anchors], layout, config);
     }
 
     function renderChart(payload) {
