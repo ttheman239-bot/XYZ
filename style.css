@@ -1,0 +1,79 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #0b1020;
+  color: #e6ecff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header {
+  width: 100%;
+  padding: 24px 16px 12px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  background: linear-gradient(90deg, #7df9ff, #ff7df9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.controls button {
+  background: #1b2447;
+  color: #e6ecff;
+  border: 1px solid #2c3a73;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.controls button:hover {
+  background: #2c3a73;
+}
+
+.controls button.active {
+  background: linear-gradient(135deg, #7df9ff, #ff7df9);
+  color: #0b1020;
+  border-color: transparent;
+}
+
+.controls button:active {
+  transform: scale(0.97);
+}
+
+main {
+  padding: 16px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+canvas {
+  background: #050816;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(125, 249, 255, 0.15);
+  max-width: 100%;
+  height: auto;
+}
