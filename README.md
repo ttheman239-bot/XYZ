@@ -1,19 +1,37 @@
-# XYZ — 2D Graphics Playground
+# 2D Graphics — Android App
 
-A small HTML5 Canvas demo with four interactive 2D scenes.
+Native Android (Kotlin + `Canvas`) port of the four-scene 2D graphics demo.
 
 ## Scenes
 
-- **Particles** — 200+ particles attracted to the cursor
-- **Bouncing Balls** — gravity + elastic collisions with the walls
-- **Fractal Tree** — recursive tree that sways in the wind
+- **Particles** — particles attracted to your finger
+- **Balls** — bouncing balls with gravity and elastic walls
+- **Fractal** — recursive tree that sways
 - **Waves** — layered sine waves with shifting hues
 
-## Run
+## Project layout
 
-Open `index.html` in any modern browser, or serve the folder:
+```
+app/
+  src/main/
+    java/com/example/graphics2d/
+      MainActivity.kt
+      GraphicsView.kt        # all four scenes
+    res/layout/activity_main.xml
+    res/values/{strings,colors,themes}.xml
+    AndroidManifest.xml
+build.gradle.kts
+settings.gradle.kts
+```
+
+The original web demo (`index.html`, `style.css`, `main.js`) is kept at the repo root for reference.
+
+## Build
+
+Open the project in Android Studio (Hedgehog or newer) and Run, or from the CLI:
 
 ```sh
-python3 -m http.server 8000
-# then visit http://localhost:8000
+./gradlew :app:assembleDebug
 ```
+
+Min SDK 24, target SDK 34, Kotlin 1.9, AGP 8.5.
