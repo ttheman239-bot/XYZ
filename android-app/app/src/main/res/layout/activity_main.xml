@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_panel">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="2D Graphics Playground"
+        android:textColor="@color/accent_cyan"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingTop="20dp"
+        android:paddingBottom="12dp" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:paddingHorizontal="12dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnParticles"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/button_scene"
+                android:paddingHorizontal="16dp"
+                android:text="@string/scene_particles"
+                android:textColor="@color/text_primary"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnBouncing"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/button_scene"
+                android:paddingHorizontal="16dp"
+                android:text="@string/scene_bouncing"
+                android:textColor="@color/text_primary"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnFractal"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/button_scene"
+                android:paddingHorizontal="16dp"
+                android:text="@string/scene_fractal"
+                android:textColor="@color/text_primary"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnWaves"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_scene"
+                android:paddingHorizontal="16dp"
+                android:text="@string/scene_waves"
+                android:textColor="@color/text_primary"
+                android:textAllCaps="false" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <com.example.graphics2d.GraphicsView
+        android:id="@+id/graphicsView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="12dp"
+        android:background="@color/bg_dark" />
+</LinearLayout>

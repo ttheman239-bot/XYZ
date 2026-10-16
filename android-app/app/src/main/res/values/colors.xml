@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_dark">#FF050816</color>
+    <color name="bg_panel">#FF0B1020</color>
+    <color name="accent_cyan">#FF7DF9FF</color>
+    <color name="accent_pink">#FFFF7DF9</color>
+    <color name="text_primary">#FFE6ECFF</color>
+    <color name="button_bg">#FF1B2447</color>
+    <color name="button_bg_active">#FF7DF9FF</color>
+</resources>

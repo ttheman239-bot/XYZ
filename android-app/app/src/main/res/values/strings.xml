@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">2D Graphics</string>
+    <string name="scene_particles">Particles</string>
+    <string name="scene_bouncing">Balls</string>
+    <string name="scene_fractal">Fractal</string>
+    <string name="scene_waves">Waves</string>
+</resources>

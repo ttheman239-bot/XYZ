@@ -58,8 +58,22 @@ docs/
   M0_CHECKLIST.md    ตรวจความเป็นไปได้ก่อนลงทุน
   POLICY.md          กฎแพลตฟอร์ม + checklist ปฏิบัติ
 
-legacy/              งานเดิม (2D graphics web + Android) — เก็บไว้อ้างอิง
+android-app/         Android (Kotlin + Canvas) 2D graphics demo
+                     — build APK ผ่าน GitHub Actions:
+                       .github/workflows/android-apk.yml
 ```
+
+## Android demo (secondary)
+
+โปรเจกต์ `android-app/` เป็นเดโม 2D graphics (Particles / Bouncing Balls /
+Fractal Tree / Waves) แยกจากระบบ Live Host หลัก Build APK ได้ 2 วิธี:
+
+- **บนเครื่องตัวเอง** (ต้องมี Android SDK + JDK 17):
+  ```sh
+  cd android-app && ./gradlew :app:assembleDebug
+  ```
+- **บน GitHub Actions**: push ก็ build ให้เอง, APK แนบเป็น artifact
+  — ดู Actions tab บน GitHub, workflow ชื่อ "Build Android APK"
 
 ## License
 
