@@ -1,0 +1,39 @@
+# พจนานุกรมคำอ่าน — แก้ได้ตามต้องการ
+# คีย์: ตัวต้นฉบับ (case-insensitive) → ค่า: คำอ่านไทย
+# ตัวโมเดล TTS บางตัวอ่านอังกฤษได้แล้ว แต่ยังต้อง normalize คำที่อ่านยาก
+
+brands:
+  shopee: ช็อปปี้
+  lazada: ลาซาด้า
+  tiktok: ติ๊กต็อก
+  facebook: เฟซบุ๊ก
+  instagram: อินสตาแกรม
+  youtube: ยูทูบ
+  google: กูเกิล
+  samsung: ซัมซุง
+  apple: แอปเปิล
+  xiaomi: เสียวมี่
+  huawei: หัวเหว่ย
+  oppo: ออปโป้
+  vivo: วีโว่
+  nike: ไนกี้
+  adidas: อาดิดาส
+
+units:
+  kg: กิโลกรัม
+  g: กรัม
+  ml: มิลลิลิตร
+  l: ลิตร
+  cm: เซนติเมตร
+  mm: มิลลิเมตร
+  m: เมตร
+  inch: นิ้ว
+
+common:
+  COD: ซี โอ ดี
+  SKU: เอส เค ยู
+  QR: คิว อาร์
+  AI: เอ ไอ
+  LIVE: ไลฟ์
+  pre-order: พรีออเดอร์
+  free: ฟรี

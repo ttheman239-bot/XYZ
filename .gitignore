@@ -1,9 +1,29 @@
-.gradle/
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
 build/
-local.properties
+
+# ของจริง — ห้าม commit
+config/config.yaml
+*.key
+.env
+
+# runtime
+cache/
+logs/
+assets/*.wav
+assets/*.mp4
+
+# IDE/OS
 .idea/
-*.iml
+.vscode/
 .DS_Store
-captures/
-.externalNativeBuild/
-.cxx/
+
+# legacy Android build
+legacy/android/.gradle/
+legacy/android/build/
+legacy/android/app/build/
+legacy/android/local.properties

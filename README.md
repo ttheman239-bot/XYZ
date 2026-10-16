@@ -1,37 +1,67 @@
-# 2D Graphics — Android App
+# Thai AI Live Host
 
-Native Android (Kotlin + `Canvas`) port of the four-scene 2D graphics demo.
+ระบบ **Digital Human ไลฟ์ขายของภาษาไทย**: ป้อนข้อมูลสินค้า → LLM แต่งสคริปต์ → TTS ไทย → lip-sync กับวิดีโอคนจริง → ส่งออก OBS/RTMP
 
-## Scenes
+อ่าน [`CONTEXT.md`](./CONTEXT.md) ก่อน — มีสถาปัตยกรรม / milestones / ความเสี่ยง / ข้อกฎแพลตฟอร์มครบ
 
-- **Particles** — particles attracted to your finger
-- **Balls** — bouncing balls with gravity and elastic walls
-- **Fractal** — recursive tree that sways
-- **Waves** — layered sine waves with shifting hues
+## สถานะโครงการ
 
-## Project layout
+สเกเลตันโค้ดระดับ **M0 → M2 เริ่มต้น** พร้อม:
+
+| ส่วน | สถานะ |
+|---|---|
+| Thai text normalizer | ✅ ใช้งานได้ + unit tests |
+| Script Engine (Anthropic SDK) | ✅ โครง + prompt caching |
+| TTS worker | 🚧 โครง + ตัวอย่าง backend 3 ตัว |
+| Lip-sync client (LiveTalking HTTP) | 🚧 โครง |
+| Orchestrator | 🚧 โครง async queue |
+| Operator Panel (FastAPI/WS) | 🚧 โครง |
+
+## เริ่มต้น
+
+1. อ่าน [`docs/INSTALL.md`](./docs/INSTALL.md) ติดตั้งเครื่องมือภายนอก (CUDA / LiveTalking / TTS / OBS)
+2. เช็ค [`docs/M0_CHECKLIST.md`](./docs/M0_CHECKLIST.md) — **ทำ M0 ให้ครบก่อนลงทุนเวลาเขียนโค้ด**
+3. อ่าน [`docs/POLICY.md`](./docs/POLICY.md) — ข้อกฎแพลตฟอร์มที่ต้องรองรับตั้งแต่ออกแบบ
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -e .[dev]
+cp config/config.example.yaml config/config.yaml
+
+# ทดสอบ normalizer
+pytest tests/
+
+# รัน script engine (ต้อง ANTHROPIC_API_KEY)
+python -m live_host.script_engine --product-file samples/product.json
+
+# รัน orchestrator ครบวงจร (ต้องเปิด LiveTalking server ไว้ก่อน)
+python -m live_host --config config/config.yaml
+```
+
+## โครงสร้าง
 
 ```
-app/
-  src/main/
-    java/com/example/graphics2d/
-      MainActivity.kt
-      GraphicsView.kt        # all four scenes
-    res/layout/activity_main.xml
-    res/values/{strings,colors,themes}.xml
-    AndroidManifest.xml
-build.gradle.kts
-settings.gradle.kts
+src/live_host/
+  normalizer.py      Thai text / number / currency normalizer
+  script_engine.py   Claude API → segments JSON
+  tts_worker.py      TTS queue (JaiTTS / Thonburian / SE-Bridge backend)
+  lipsync_client.py  LiveTalking HTTP client
+  orchestrator.py    async pipeline
+  operator_panel.py  FastAPI + WebSocket + static HTML
+
+config/
+  config.example.yaml   endpoints, model ids, keys
+  pronunciations.yaml   brand/word → Thai reading
+
+docs/
+  INSTALL.md         ขั้นตอนติดตั้งเครื่องมือภายนอก พร้อมลิงก์
+  M0_CHECKLIST.md    ตรวจความเป็นไปได้ก่อนลงทุน
+  POLICY.md          กฎแพลตฟอร์ม + checklist ปฏิบัติ
+
+legacy/              งานเดิม (2D graphics web + Android) — เก็บไว้อ้างอิง
 ```
 
-The original web demo (`index.html`, `style.css`, `main.js`) is kept at the repo root for reference.
+## License
 
-## Build
-
-Open the project in Android Studio (Hedgehog or newer) and Run, or from the CLI:
-
-```sh
-./gradlew :app:assembleDebug
-```
-
-Min SDK 24, target SDK 34, Kotlin 1.9, AGP 8.5.
+โค้ดในที่นี้: MIT
+Weights / โมเดลภายนอก (MuseTalk, JaiTTS, ฯลฯ): **ต้องตรวจ license แยก** ก่อนใช้เชิงพาณิชย์ — ดู `docs/INSTALL.md`

@@ -1,0 +1,44 @@
+# คัดลอกเป็น config/config.yaml แล้วแก้ค่าตามเครื่องของคุณ
+# config.yaml อยู่ใน .gitignore — ห้าม commit คีย์
+
+script_engine:
+  model: claude-sonnet-5-5          # หรือ claude-opus-5-5 สำหรับคุณภาพสูงสุด
+  max_tokens: 2048
+  cache_system_prompt: true          # เปิด prompt caching (ค่าเริ่มต้น)
+  temperature: 0.4
+
+tts:
+  backend: jaitts                    # jaitts | thonburian | se_bridge | mock
+  endpoint: http://127.0.0.1:8080    # ถ้า TTS รันเป็น service
+  model_path: ~/models/jaitts        # ถ้าโหลด local
+  voice_sample: ./assets/voice_ref.wav
+  speed: 1.0
+  buffer_segments: 3                 # pre-generate ล่วงหน้ากี่ segment
+
+lipsync:
+  provider: livetalking
+  base_url: http://127.0.0.1:8010    # LiveTalking HTTP API
+  model: musetalk                     # musetalk | wav2lip | ernerf | ultralight
+  session_id: default
+  transport: virtualcam              # virtualcam | rtmp | webrtc
+  rtmp_push_url: rtmp://127.0.0.1/live/stream  # ถ้า transport=rtmp
+
+idle_actions:
+  - name: smile
+    clip: ./assets/idle_smile.mp4
+  - name: point
+    clip: ./assets/idle_point.mp4
+  - name: nod
+    clip: ./assets/idle_nod.mp4
+
+operator_panel:
+  host: 127.0.0.1
+  port: 8765
+
+normalizer:
+  pronunciations_file: config/pronunciations.yaml
+  max_words_per_segment: 20
+
+logging:
+  level: INFO
+  file: logs/live_host.log
